@@ -1,58 +1,87 @@
 import os
 
+# Clears the terminal screen ---CHAT Based Suggestion---
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
+# Prints the current game board
 def print_board(board):
     print("\n")
     for row in range(3):
-        cells = []
-        for col in range(3):
-            val = board[row][col]
-            cells.append(f" {val} ")
-        print("  " + "|".join(cells))
+        # Build each row as " X | O |   " etc.
+        cell1 = " " + board[row][0] + " "
+        cell2 = " " + board[row][1] + " "
+        cell3 = " " + board[row][2] + " "
+        print("  " + cell1 + "|" + cell2 + "|" + cell3)
         if row < 2:
-            print("  " + "-" * 11)
+            print("  " + "-----------")
     print()
 
+# Prints a numbered guide so players know which number = which spot
 def print_guide():
     print("  Position guide:")
+    num = 1
     for row in range(3):
-        cells = [f" {row*3 + col + 1} " for col in range(3)]
-        print("  " + "|".join(cells))
+        cell1 = " " + str(num) + " ";   num += 1
+        cell2 = " " + str(num) + " ";   num += 1
+        cell3 = " " + str(num) + " ";   num += 1
+        print("  " + cell1 + "|" + cell2 + "|" + cell3)
         if row < 2:
-            print("  " + "-" * 11)
+            print("  " + "-----------")
     print()
 
+# Returns True if the given player has won
 def check_winner(board, player):
-    # Check rows and columns
-    for i in range(3):
-        if all(board[i][col] == player for col in range(3)):
+    # Check each row
+    for row in range(3):
+        if board[row][0] == player and board[row][1] == player and board[row][2] == player:
             return True
-        if all(board[row][i] == player for row in range(3)):
+
+    # Check each column
+    for col in range(3):
+        if board[0][col] == player and board[1][col] == player and board[2][col] == player:
             return True
-    # Check diagonals
-    if all(board[i][i] == player for i in range(3)):
+
+    # Check top-left to bottom-right diagonal
+    if board[0][0] == player and board[1][1] == player and board[2][2] == player:
         return True
-    if all(board[i][2 - i] == player for i in range(3)):
+
+    # Check top-right to bottom-left diagonal
+    if board[0][2] == player and board[1][1] == player and board[2][0] == player:
         return True
+
     return False
 
+# Returns True if every cell is filled (no one won = draw)
 def is_draw(board):
-    return all(board[row][col] != " " for row in range(3) for col in range(3))
+    for row in range(3):
+        for col in range(3):
+            if board[row][col] == " ":
+                return False  # Found an empty spot, not a draw yet
+    return True
 
+# Asks the player for a move and returns the row and column
 def get_move(board, player):
     while True:
         try:
             move = int(input(f"  Player {player}, enter position (1-9): "))
+
             if move < 1 or move > 9:
                 print("  Please enter a number between 1 and 9.")
                 continue
-            row, col = divmod(move - 1, 3)
+
+            # Convert 1-9 into row and column
+            # e.g. move 5 → row 1, col 1 (middle)
+            move_index = move - 1
+            row = move_index // 3
+            col = move_index % 3
+
             if board[row][col] != " ":
                 print("  That spot is already taken! Try again.")
                 continue
+
             return row, col
+
         except ValueError:
             print("  Invalid input. Enter a number 1-9.")
 
@@ -63,19 +92,27 @@ def main():
         print("         TIC  TAC  TOE")
         print("  ================================")
 
-        board = [[" " for _ in range(3)] for _ in range(3)]
+        # Set up a blank 3x3 board filled with spaces
+        board = [
+            [" ", " ", " "],
+            [" ", " ", " "],
+            [" ", " ", " "]
+        ]
+
         players = ["X", "O"]
-        current = 0
+        current = 0  # 0 = X's turn, 1 = O's turn
         scores = {"X": 0, "O": 0, "Draws": 0}
 
         print_guide()
 
         while True:
             player = players[current]
+
             print_board(board)
             print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
             print()
 
+            # Get the player's move and place it on the board
             row, col = get_move(board, player)
             board[row][col] = player
 
@@ -84,6 +121,7 @@ def main():
             print("         TIC  TAC  TOE")
             print("  ================================")
 
+            # Check if current player won
             if check_winner(board, player):
                 print_board(board)
                 scores[player] += 1
@@ -91,6 +129,7 @@ def main():
                 print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
                 break
 
+            # Check if the board is full with no winner
             if is_draw(board):
                 print_board(board)
                 scores["Draws"] += 1
@@ -98,7 +137,11 @@ def main():
                 print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
                 break
 
-            current = 1 - current
+            # Switch to the other player (0 → 1, or 1 → 0)
+            if current == 0:
+                current = 1
+            else:
+                current = 0
 
         print()
         again = input("  Play again? (y/n): ").strip().lower()
