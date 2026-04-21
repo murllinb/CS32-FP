@@ -1,10 +1,10 @@
 import os
 
-# Clears the terminal screen ---CHAT Based Suggestion---
+# Clear the terminal screen ---CHAT Based Suggestion---
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
-# Prints the current game board
+# Print the current game board
 def print_board(board):
     print("\n")
     for row in range(3):
@@ -17,7 +17,7 @@ def print_board(board):
             print("  " + "-----------")
     print()
 
-# Prints a numbered guide so players know which number = which spot
+# Print a numbered guide so players know which number = which spot
 def print_guide():
     print("  Position guide:")
     num = 1
@@ -30,7 +30,7 @@ def print_guide():
             print("  " + "-----------")
     print()
 
-# Returns True if the given player has won
+# Retur true if the given player has won
 def check_winner(board, player):
     # Check each row
     for row in range(3):
@@ -52,15 +52,15 @@ def check_winner(board, player):
 
     return False
 
-# Returns True if every cell is filled (no one won = draw)
+# Return true if every cell is filled (no one won = draw)
 def is_draw(board):
     for row in range(3):
         for col in range(3):
             if board[row][col] == " ":
-                return False  # Found an empty spot, not a draw yet
+                return False  # empty spot was found, so not a draw yet
     return True
 
-# Asks the player for a move and returns the row and column
+# Ask the player for a move and returns the row and column
 def get_move(board, player):
     while True:
         try:
@@ -112,7 +112,7 @@ def main():
             print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
             print()
 
-            # Get the player's move and place it on the board
+            # Ask for player move and place on board
             row, col = get_move(board, player)
             board[row][col] = player
 
