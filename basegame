@@ -1,0 +1,110 @@
+import os
+
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
+
+def print_board(board):
+    print("\n")
+    for row in range(3):
+        cells = []
+        for col in range(3):
+            val = board[row][col]
+            cells.append(f" {val} ")
+        print("  " + "|".join(cells))
+        if row < 2:
+            print("  " + "-" * 11)
+    print()
+
+def print_guide():
+    print("  Position guide:")
+    for row in range(3):
+        cells = [f" {row*3 + col + 1} " for col in range(3)]
+        print("  " + "|".join(cells))
+        if row < 2:
+            print("  " + "-" * 11)
+    print()
+
+def check_winner(board, player):
+    # Check rows and columns
+    for i in range(3):
+        if all(board[i][col] == player for col in range(3)):
+            return True
+        if all(board[row][i] == player for row in range(3)):
+            return True
+    # Check diagonals
+    if all(board[i][i] == player for i in range(3)):
+        return True
+    if all(board[i][2 - i] == player for i in range(3)):
+        return True
+    return False
+
+def is_draw(board):
+    return all(board[row][col] != " " for row in range(3) for col in range(3))
+
+def get_move(board, player):
+    while True:
+        try:
+            move = int(input(f"  Player {player}, enter position (1-9): "))
+            if move < 1 or move > 9:
+                print("  Please enter a number between 1 and 9.")
+                continue
+            row, col = divmod(move - 1, 3)
+            if board[row][col] != " ":
+                print("  That spot is already taken! Try again.")
+                continue
+            return row, col
+        except ValueError:
+            print("  Invalid input. Enter a number 1-9.")
+
+def main():
+    while True:
+        clear()
+        print("\n  ================================")
+        print("         TIC  TAC  TOE")
+        print("  ================================")
+
+        board = [[" " for _ in range(3)] for _ in range(3)]
+        players = ["X", "O"]
+        current = 0
+        scores = {"X": 0, "O": 0, "Draws": 0}
+
+        print_guide()
+
+        while True:
+            player = players[current]
+            print_board(board)
+            print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+            print()
+
+            row, col = get_move(board, player)
+            board[row][col] = player
+
+            clear()
+            print("\n  ================================")
+            print("         TIC  TAC  TOE")
+            print("  ================================")
+
+            if check_winner(board, player):
+                print_board(board)
+                scores[player] += 1
+                print(f"  Player {player} wins!\n")
+                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+
+            if is_draw(board):
+                print_board(board)
+                scores["Draws"] += 1
+                print("  It's a draw!\n")
+                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+
+            current = 1 - current
+
+        print()
+        again = input("  Play again? (y/n): ").strip().lower()
+        if again != "y":
+            print("\n  Thanks for playing! Goodbye.\n")
+            break
+
+if __name__ == "__main__":
+    main()
