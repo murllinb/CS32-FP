@@ -1,6 +1,6 @@
 import os
 
-# Clear the terminal screen ---CHAT Based Suggestion---
+# Clear the terminal screen
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
