@@ -1,1 +1,154 @@
+### import os and terminal clearing was a GAI suggestion to help deal with visual clutter, I commented out all the code that did the suggestion to show that the code still works w/o it.
+# import os
 
+# # Clear the terminal screen
+# def clear():
+#     os.system("cls" if os.name == "nt" else "clear")
+
+# Print the current game board
+def print_board(board):
+    print("\n")
+    for row in range(3):
+        # Build each row as " X | O |   " etc.
+        cell1 = " " + board[row][0] + " "
+        cell2 = " " + board[row][1] + " "
+        cell3 = " " + board[row][2] + " "
+        print("  " + cell1 + "|" + cell2 + "|" + cell3)
+        if row < 2:
+            print("  " + "-----------")
+    print()
+
+# Print a numbered guide so players know which number = which spot
+def print_guide():
+    print("  Position guide:")
+    num = 1
+    for row in range(3):
+        cell1 = " " + str(num) + " ";   num += 1
+        cell2 = " " + str(num) + " ";   num += 1
+        cell3 = " " + str(num) + " ";   num += 1
+        print("  " + cell1 + "|" + cell2 + "|" + cell3)
+        if row < 2:
+            print("  " + "-----------")
+    print()
+
+# Retur true if the given player has won
+def check_winner(board, player):
+    # Check each row
+    for row in range(3):
+        if board[row][0] == player and board[row][1] == player and board[row][2] == player:
+            return True
+
+    # Check each column
+    for col in range(3):
+        if board[0][col] == player and board[1][col] == player and board[2][col] == player:
+            return True
+
+    # Check top-left to bottom-right diagonal
+    if board[0][0] == player and board[1][1] == player and board[2][2] == player:
+        return True
+
+    # Check top-right to bottom-left diagonal
+    if board[0][2] == player and board[1][1] == player and board[2][0] == player:
+        return True
+
+    return False
+
+# Return true if every cell is filled (no one won = draw)
+def is_draw(board):
+    for row in range(3):
+        for col in range(3):
+            if board[row][col] == " ":
+                return False  # empty spot was found, so not a draw yet
+    return True
+
+# Ask the player for a move and returns the row and column
+def get_move(board, player):
+    while True:
+        try:
+            move = int(input(f"  Player {player}, enter position (1-9): "))
+
+            if move < 1 or move > 9:
+                print("  Please enter a number between 1 and 9.")
+                continue
+
+            # Convert 1-9 into row and column
+            # e.g. move 5 → row 1, col 1 (middle)
+            move_index = move - 1
+            row = move_index // 3
+            col = move_index % 3
+
+            if board[row][col] != " ":
+                print("  That spot is already taken! Try again.")
+                continue
+
+            return row, col
+
+        except ValueError:
+            print("  Invalid input. Enter a number 1-9.")
+
+def main():
+    while True:
+        # clear()
+        print("\n  ================================")
+        print("         TIC  TAC  TOE")
+        print("  ================================")
+
+        # Set up a blank 3x3 board filled with spaces
+        board = [
+            [" ", " ", " "],
+            [" ", " ", " "],
+            [" ", " ", " "]
+        ]
+
+        players = ["X", "O"]
+        current = 0  # 0 = X's turn, 1 = O's turn
+        scores = {"X": 0, "O": 0, "Draws": 0}
+
+        print_guide()
+
+        while True:
+            player = players[current]
+
+            print_board(board)
+            print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+            print()
+
+            # Ask for player move and place on board
+            row, col = get_move(board, player)
+            board[row][col] = player
+
+            # clear()
+            print("\n  ================================")
+            print("         TIC  TAC  TOE")
+            print("  ================================")
+
+            # Check if current player won
+            if check_winner(board, player):
+                print_board(board)
+                scores[player] += 1
+                print(f"  Player {player} wins!\n")
+                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+
+            # Check if the board is full with no winner
+            if is_draw(board):
+                print_board(board)
+                scores["Draws"] += 1
+                print("  It's a draw!\n")
+                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+
+            # Switch to the other player (0 → 1, or 1 → 0)
+            if current == 0:
+                current = 1
+            else:
+                current = 0
+
+        print()
+        again = input("  Play again? (y/n): ").strip().lower()
+        if again != "y":
+            print("\n  Thanks for playing! Goodbye.\n")
+            break
+
+if __name__ == "__main__":
+    main()
