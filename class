@@ -2,5 +2,7 @@
 # Dice 1 will have two functions. A function for removing your piece and a function for removing your opps piece. 
 import random 
 def remove_piece(board, targetmarker): 
+def roll_dice_one(board, current_player, opponent):
+
 
 
