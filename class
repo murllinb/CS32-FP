@@ -1,2 +1,5 @@
-def class_one: 
+# Dice 1 will have a 50% chance of removing your opponents piece and a 50% chance you have to remove your own piece. 
+# Dice 1 will have two functions. A function for removing your piece and a function for removing your opps piece. 
+import random 
+def remove_piece
 
