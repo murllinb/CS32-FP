@@ -8,10 +8,22 @@ def remove_piece(board, targetmarker):
       move = int(input(f" Select a ' {targetmarker} ' piece to remove (1-9): "))
       if move < 1 or > 9
         print("Please enter a number between 1-9.")
-        continue # continue breaks this loop to the except and makes u pick again
-      
+        continue
+      move_index = move - 1
+            row = move_index // 3
+            col = move_index % 3
+
+            if board[row][col] != target_marker:
+                print(f"  That spot does not contain a '{target_marker}'. Try again...")
+                continue
+            
+            # Remove the piece by replacing it with a blank space
+            board[row][col] = " "
+            print(f"  '{target_marker}' piece removed!")
+            break
     except ValueError: 
       print("Numbers outside of 1-9 are invalid. Pick again...")
+
 def roll_dice_one(board, current_player, opponent):
   roll = random.randint(1,6)
   print(f"\n  🎲 You rolled a {roll}!") 
@@ -19,7 +31,7 @@ def roll_dice_one(board, current_player, opponent):
   if roll in [1,2,3]: 
     print(f"  Awesome! You get to remove one of Player {opponent}'s pieces.")
     remove_piece(board, opponent) 
-  else: # roll is 4, 5, or 6
+  else: # roll is 4,5,6
     print(f"  Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
     remove_piece(board, current_player)
 
