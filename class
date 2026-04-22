@@ -1,8 +1,27 @@
 # Dice 1 will have a 50% chance of removing your opponents piece and a 50% chance you have to remove your own piece. 
 # Dice 1 will have two functions. A function for removing your piece and a function for removing your opps piece. 
 import random 
+# make a function that prompts you to remove a piece. make sure you are only removing a piece for the available board space. 
 def remove_piece(board, targetmarker): 
+  while True: 
+    try: 
+      move = int(input(f" Select a ' {targetmarker} ' piece to remove (1-9): "))
+      if move < 1 or > 9
+        print("Please enter a number between 1-9.")
+        continue # continue breaks this loop to the except and makes u pick again
+      
+    except ValueError: 
+      print("Numbers outside of 1-9 are invalid. Pick again...")
 def roll_dice_one(board, current_player, opponent):
+  roll = random.randint(1,6)
+  print(f"\n  🎲 You rolled a {roll}!") 
+
+  if roll in [1,2,3]: 
+    print(f"  Awesome! You get to remove one of Player {opponent}'s pieces.")
+    remove_piece(board, opponent) 
+  else: # roll is 4, 5, or 6
+    print(f"  Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
+    remove_piece(board, current_player)
 
 
 
