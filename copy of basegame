@@ -1,6 +1,8 @@
 ### import os and terminal clearing was a GAI suggestion to help deal with visual clutter, I commented out all the code that did the suggestion to show that the code still works w/o it.
 # import os
 
+from dice import roll_dice_one
+
 # # Clear the terminal screen
 # def clear():
 #     os.system("cls" if os.name == "nt" else "clear")
@@ -108,6 +110,7 @@ def main():
 
         while True:
             player = players[current]
+            opponent = players[1 if current == 0 else 0] # this way we can be more effective with dice uses 
 
             print_board(board)
             print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
