@@ -1,0 +1,262 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from dice import choose_dice
+
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
+
+def print_board(board, protected=None):
+    if protected is None:
+        protected = set()
+    print("\n")
+    for row in range(3):
+        cells = []
+        for col in range(3):
+            marker = board[row][col]
+            if (row, col) in protected and marker != " ":
+                cells.append("[" + marker + "]")
+            else:
+                cells.append(" " + marker + " ")
+        print("  " + cells[0] + "|" + cells[1] + "|" + cells[2])
+        if row < 2:
+            print("  " + "-----------")
+    print()
+    if protected:
+        print("  ( [X] or [O] = protected piece )")
+
+def print_guide():
+    print("  Position guide:")
+    num = 1
+    for row in range(3):
+        cell1 = " " + str(num) + " ";   num += 1
+        cell2 = " " + str(num) + " ";   num += 1
+        cell3 = " " + str(num) + " ";   num += 1
+        print("  " + cell1 + "|" + cell2 + "|" + cell3)
+        if row < 2:
+            print("  " + "-----------")
+    print()
+
+def check_winner(board, player):
+    for row in range(3):
+        if board[row][0] == player and board[row][1] == player and board[row][2] == player:
+            return True
+    for col in range(3):
+        if board[0][col] == player and board[1][col] == player and board[2][col] == player:
+            return True
+    if board[0][0] == player and board[1][1] == player and board[2][2] == player:
+        return True
+    if board[0][2] == player and board[1][1] == player and board[2][0] == player:
+        return True
+    return False
+
+def is_draw(board):
+    for row in range(3):
+        for col in range(3):
+            if board[row][col] == " ":
+                return False
+    return True
+
+def get_removable_positions(board, target, protected=None):
+    """Return list of 1-9 positions occupied by target that are not protected."""
+    if protected is None:
+        protected = set()
+    positions = []
+    for row in range(3):
+        for col in range(3):
+            if board[row][col] == target and (row, col) not in protected:
+                positions.append(row * 3 + col + 1)
+    return positions
+
+def get_protected_positions(board, target, protected):
+    """Return list of 1-9 positions occupied by target that ARE protected."""
+    positions = []
+    for row in range(3):
+        for col in range(3):
+            if board[row][col] == target and (row, col) in protected:
+                positions.append(row * 3 + col + 1)
+    return positions
+
+def remove_marker(board, remover, target, protected):
+    """Ask remover to pick one of target's unprotected markers to remove."""
+    positions = get_removable_positions(board, target, protected)
+    all_positions = get_removable_positions(board, target)  # ignoring protection
+    all_occupied = [p for p in range(1, 10)
+                    if board[(p-1)//3][(p-1)%3] == target]
+
+    if not all_occupied:
+        print(f"  Player {target} has no markers on the board.")
+        return
+
+    if not positions:
+        print(f"  All of Player {target}'s pieces are protected! Removal skipped.")
+        return
+
+    print(f"  Player {target}'s removable markers are at positions: {positions}")
+    while True:
+        try:
+            pick = int(input(f"  Player {remover}, choose a position to remove: "))
+            if pick not in positions:
+                print(f"  Invalid choice. Pick from: {positions}")
+                continue
+            idx = pick - 1
+            row, col = idx // 3, idx % 3
+            board[row][col] = " "
+            protected.discard((row, col))
+            print(f"  Player {remover} removed Player {target}'s marker from position {pick}!")
+            return
+        except ValueError:
+            print("  Invalid input. Enter a number.")
+
+def protect_marker(board, player, protected):
+    """Ask player to choose one of their own pieces to protect."""
+    positions = [p for p in range(1, 10)
+                 if board[(p-1)//3][(p-1)%3] == player and ((p-1)//3, (p-1)%3) not in protected]
+    if not positions:
+        print(f"  Player {player} has no unprotected pieces to protect.")
+        return
+    print(f"  Player {player}'s unprotected pieces are at positions: {positions}")
+    while True:
+        try:
+            pick = int(input(f"  Player {player}, choose a piece to protect: "))
+            if pick not in positions:
+                print(f"  Invalid choice. Pick from: {positions}")
+                continue
+            idx = pick - 1
+            protected.add((idx // 3, idx % 3))
+            print(f"  Player {player}'s piece at position {pick} is now protected!")
+            return
+        except ValueError:
+            print("  Invalid input. Enter a number.")
+
+def remove_protection(board, remover, target, protected):
+    """Ask remover to strip protection from one of target's protected pieces."""
+    positions = get_protected_positions(board, target, protected)
+    if not positions:
+        print(f"  Player {remover} can remove a protection, but all of Player {target}'s pieces are unprotected.")
+        return
+    print(f"  Player {target}'s protected pieces are at positions: {positions}")
+    while True:
+        try:
+            pick = int(input(f"  Player {remover}, choose a piece to unprotect: "))
+            if pick not in positions:
+                print(f"  Invalid choice. Pick from: {positions}")
+                continue
+            idx = pick - 1
+            protected.discard((idx // 3, idx % 3))
+            print(f"  Player {remover} removed protection from Player {target}'s piece at position {pick}!")
+            return
+        except ValueError:
+            print("  Invalid input. Enter a number.")
+
+def get_move(board, player):
+    while True:
+        try:
+            move = int(input(f"  Player {player}, enter position (1-9): "))
+            if move < 1 or move > 9:
+                print("  Please enter a number between 1 and 9.")
+                continue
+            move_index = move - 1
+            row = move_index // 3
+            col = move_index % 3
+            if board[row][col] != " ":
+                print("  That spot is already taken! Try again.")
+                continue
+            return row, col
+        except ValueError:
+            print("  Invalid input. Enter a number 1-9.")
+
+def main():
+    while True:
+        clear()
+        print("\n  ================================")
+        print("         TIC  TAC  TOE")
+        print("  ================================")
+
+        # ── Dice selection (runs once per game) ──────────────────────────────
+        print("\n  Before the game starts, each player picks their dice.")
+        player_dice = {
+            "X": choose_dice("X"),
+            "O": choose_dice("O"),
+        }
+
+        # ── Board setup ──────────────────────────────────────────────────────
+        board = [
+            [" ", " ", " "],
+            [" ", " ", " "],
+            [" ", " ", " "]
+        ]
+
+        players = ["X", "O"]
+        current = 0
+        scores = {"X": 0, "O": 0, "Draws": 0}
+        protected = set()  # stores (row, col) tuples of protected pieces
+
+        print_guide()
+
+        while True:
+            player = players[current]
+            dice   = player_dice[player]
+
+            print_board(board, protected)
+            print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+            print()
+
+            # ── Dice roll + abilities ────────────────────────────────────────
+            roll = dice.roll()
+            opponent = "O" if player == "X" else "X"
+            print(f"  Player {player} rolled a {roll} ({dice.name})")
+
+            if roll == 6:
+                print(f"  ★  Rolled a 6! Player {player} can remove one of Player {opponent}'s markers.")
+                remove_marker(board, remover=player, target=opponent, protected=protected)
+                print_board(board, protected)
+
+            elif roll == 5:
+                print(f"  🛡  Rolled a 5! Player {player} can protect one of their pieces.")
+                protect_marker(board, player=player, protected=protected)
+                print_board(board, protected)
+
+            elif roll == 2:
+                print(f"  ✂  Rolled a 2! Player {player} can remove a protection from one of Player {opponent}'s pieces.")
+                remove_protection(board, remover=player, target=opponent, protected=protected)
+                print_board(board, protected)
+
+            elif roll == 1:
+                print(f"  ✦  Rolled a 1! Player {opponent} can remove one of Player {player}'s markers.")
+                remove_marker(board, remover=opponent, target=player, protected=protected)
+                print_board(board, protected)
+
+            # rolls 3 and 4 are neutral — no effect
+
+            row, col = get_move(board, player)
+            board[row][col] = player
+
+            clear()
+            print("\n  ================================")
+            print("         TIC  TAC  TOE")
+            print("  ================================")
+
+            if check_winner(board, player):
+                print_board(board, protected)
+                scores[player] += 1
+                print(f"  Player {player} wins!\n")
+                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+
+            if is_draw(board):
+                print_board(board, protected)
+                scores["Draws"] += 1
+                print("  It's a draw!\n")
+                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+
+            current = 1 if current == 0 else 0
+
+        print()
+        again = input("  Play again? (y/n): ").strip().lower()
+        if again != "y":
+            print("\n  Thanks for playing! Goodbye.\n")
+            break
+
+if __name__ == "__main__":
+    main()
