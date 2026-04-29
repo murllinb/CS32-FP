@@ -51,7 +51,7 @@ def roll_dice_two(board, current_player, opponent):
     remove_piece(board, current_player)
     Return True
   else: # if roll in 2 or 3 
-    print(f" You rolled a {roll}. No special moves!")
+    print(f" No special moves! Place down a piece like regular-smegular.")
     Return False
 
 
