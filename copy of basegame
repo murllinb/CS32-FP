@@ -33,7 +33,7 @@ def print_guide():
             print("  " + "-----------")
     print()
 
-# Retur true if the given player has won
+# Return true if the given player has won
 def check_winner(board, player):
     # Check each row
     for row in range(3):
@@ -88,12 +88,36 @@ def get_move(board, player):
         except ValueError:
             print("  Invalid input. Enter a number 1-9.")
 
+def explain_dice_rules(): 
+    print("\n  ========================================================")
+    print("                   DICE POWER-UPS")
+    print("  ========================================================")
+    print("  Dice 1: 50% chance to remove opponent's piece, 50% to remove your own.") # Dice 1 will have a 50% chance of removing your opponents piece and a 50% chance you have to remove your own piece. [cite: 1]
+    print("  Dice 2: 25% chance to remove opponent's piece, 25% to remove your own,")
+    print("          50% chance of nothing (place piece normally).")
+    print("  Dice 3: ~17% (1/6) chance to remove opponent's piece, ~17% (1/6) to remove your own,")
+    print("          ~66% (4/6) chance of nothing (place piece normally).")
+    print("  ========================================================\n")
+
 def main():
     while True:
         # clear()
         print("\n  ================================")
         print("         TIC  TAC  TOE")
         print("  ================================")
+
+        explain_dice_rules
+
+        players = ["X", "O"]
+        dice_choices = {}
+
+        for p in players: 
+            while True: 
+                choice = input(f" Player{p}, choose your dice (1,2, or 3): ").strip()
+                if choice in ['1', '2', '3']: 
+                    dice_choices[p] = int(choice) 
+                    break 
+                print(" Invalid choice. Please pick 1, 2, or 3.") 
 
         # Set up a blank 3x3 board filled with spaces
         board = [
@@ -102,7 +126,6 @@ def main():
             [" ", " ", " "]
         ]
 
-        players = ["X", "O"]
         current = 0  # 0 = X's turn, 1 = O's turn
         scores = {"X": 0, "O": 0, "Draws": 0}
 
