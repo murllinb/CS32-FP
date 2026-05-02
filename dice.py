@@ -2,25 +2,37 @@
 # Dice 1 will have two functions. A function for removing your piece and a function for removing your opps piece. 
 import random 
 # make a function that prompts you to remove a piece. make sure you are only removing a piece for the available board space. 
-def remove_piece(board, targetmarker): 
+def remove_piece(board, target_marker): 
+  piece_exists = False 
+  for row in board: 
+    if target_marker in row: 
+      piece_exists = True 
+      break 
+      
+  if not piece_exists: 
+    print(f" No '{target_marker}' pieces on the board to remove! ")
+    return False
+    
   while True: 
     try: 
       move = int(input(f" Select a ' {targetmarker} ' piece to remove (1-9): "))
-      if move < 1 or > 9
+      if move < 1 or > 9:
         print("Please enter a number between 1-9.")
         continue
+        
       move_index = move - 1
-            row = move_index // 3
-            col = move_index % 3
+      row = move_index // 3
+      col = move_index % 3
 
-            if board[row][col] != target_marker:
-                print(f"  That spot does not contain a '{target_marker}'. Try again...")
-                continue
+      if board[row][col] != target_marker:
+        print(f"  That spot does not contain a '{target_marker}'. Try again...")
+        continue
             
-            # Remove the piece by replacing it with a blank space
-            board[row][col] = " "
-            print(f"  '{target_marker}' piece removed!")
-            break
+      # Remove the piece by replacing it with a blank space
+      board[row][col] = " "
+      print(f"  '{target_marker}' piece removed!")
+      break
+      
     except ValueError: 
       print("Numbers outside of 1-9 are invalid. Pick again...")
 
@@ -30,10 +42,10 @@ def roll_dice_one(board, current_player, opponent):
 
   if roll in [1,2,3]: 
     print(f"  Awesome! You get to remove one of Player {opponent}'s pieces.")
-    remove_piece(board, opponent) 
+    return remove_piece(board, opponent) 
   else: # roll is 4,5,6
     print(f"  Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
-    remove_piece(board, current_player)
+    return remove_piece(board, current_player)
 
 
 # dice 2 will have a 1/4 chance for removing opps or your own piece. 1/2 chance for null and placing a piece like normal game play
@@ -44,20 +56,13 @@ def roll_dice_two(board, current_player, opponent):
 
   if roll == 1:
     print(f"  You got a 1! You get to remove one of Player {opponent}'s pieces.")
-    remove_piece(board, opponent)  
-    Return True
+    return remove_piece(board, opponent)  
   elif roll == 4:
     print(f"  Oh no! You rolled a 4. You must remove one of your own '{current_player}' pieces.")
-    remove_piece(board, current_player)
-    Return True
+    return remove_piece(board, current_player)
   else: # if roll in 2 or 3 
     print(f" No special moves! Place down a piece like regular-smegular.")
     Return False
-
-
-
-
-
 
 # dice 3 will have a 1/6 chance for removing opps or your own piece. 4/6 chance for null and placing a piece like normal game play
 
@@ -67,12 +72,10 @@ def roll_dice_three(board, current_player, opponent):
 
   if roll == 1: 
     print(f" Awesome! You get to remove one of Player {opponent}'s pieces.")
-    remove_piece(board, opponent)
-    return True
+    return remove_piece(board, opponent)
   elif roll == 6: 
     print(f" Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
-    remove_piece(board, current_player) 
-    return True 
+    return remove_piece(board, current_player) 
   else: 
     print(" Nothing significant happened! You must place down a piece...")
     return False 
