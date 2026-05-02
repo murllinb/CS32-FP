@@ -106,7 +106,7 @@ def main():
         print("         TIC  TAC  TOE")
         print("  ================================")
 
-        explain_dice_rules
+        explain_dice_rules()
 
         players = ["X", "O"]
         dice_choices = {}
@@ -117,7 +117,8 @@ def main():
                 if choice in ['1', '2', '3']: 
                     dice_choices[p] = int(choice) 
                     break 
-                print(" Invalid choice. Please pick 1, 2, or 3.") 
+                else:
+                    print(" Invalid choice. Please pick 1, 2, or 3.") 
 
         # Set up a blank 3x3 board filled with spaces
         board = [
@@ -139,9 +140,35 @@ def main():
             print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
             print()
 
+            # now we ask for rolling or placing 
+            action = ''
+            while action not in ['roll', 'place']:
+                action = input(f" Player {player}, do you want to 'roll' your dice or 'place' a piece? ")
+                if action not in ['roll', 'place']:
+                    print(" Please type 'roll' or 'place'. ")
+
+            turn_used_by_dice = False 
+
+            if action == 'roll': 
+                dice_num = dice_choices[player] 
+
+                # Dice is chosen. do the dice tasks and whether or not a removal happens 
+                if dice_num == 1: 
+                    turn_used_by_dice = roll_dice_one(board, player, opponent) 
+                elif dice_num == 2: 
+                    turn_used_by_dice = roll_dice_two(board, player, opponent) 
+                elif dice_num == 3: 
+                    turn_used_by_dice = roll_dice_three(board, player, opponent) 
+
+            # if the player chose to place a piece or their dice roll didn't give a removal 
+            if action == 'place' or not turn_used_by_dice: 
+                row, col = get_move(board, player) 
+                board[row][col] = player 
+
+            # below part has been updated into above part
             # Ask for player move and place on board
-            row, col = get_move(board, player)
-            board[row][col] = player
+            # row, col = get_move(board, player)
+            # board[row][col] = player
 
             # clear()
             print("\n  ================================")
