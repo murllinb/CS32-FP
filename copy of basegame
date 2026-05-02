@@ -2,6 +2,8 @@
 # import os
 
 from dice import roll_dice_one
+from dice import roll_dice_two
+from dice import roll_dice_three
 
 # # Clear the terminal screen
 # def clear():
