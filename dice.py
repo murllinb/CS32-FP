@@ -38,13 +38,13 @@ def remove_piece(board, target_marker):
 
 def roll_dice_one(board, current_player, opponent):
   roll = random.randint(1,6)
-  print(f"\n  🎲 You rolled a {roll}!") 
+  print(f"\n 🎲 You rolled a {roll}!") 
 
   if roll in [1,2,3]: 
     print(f"  Awesome! You get to remove one of Player {opponent}'s pieces.")
     return remove_piece(board, opponent) 
   else: # roll is 4,5,6
-    print(f"  Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
+    print(f" Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
     return remove_piece(board, current_player)
 
 
@@ -52,13 +52,13 @@ def roll_dice_one(board, current_player, opponent):
 
 def roll_dice_two(board, current_player, opponent):
   roll = random.randint(1,4)
-  print(f"\n  🎲 You rolled a {roll}!") 
+  print(f"\n 🎲 You rolled a {roll}!") 
 
   if roll == 1:
-    print(f"  You got a 1! You get to remove one of Player {opponent}'s pieces.")
+    print(f" You got a 1! You get to remove one of Player {opponent}'s pieces.")
     return remove_piece(board, opponent)  
   elif roll == 4:
-    print(f"  Oh no! You rolled a 4. You must remove one of your own '{current_player}' pieces.")
+    print(f" Oh no! You rolled a 4. You must remove one of your own '{current_player}' pieces.")
     return remove_piece(board, current_player)
   else: # if roll in 2 or 3 
     print(f" No special moves! Place down a piece like regular-smegular.")
@@ -68,7 +68,7 @@ def roll_dice_two(board, current_player, opponent):
 
 def roll_dice_three(board, current_player, opponent):
   roll = random.randint(1,6)
-  print(f"\n You rolled a {roll}!")
+  print(f"\n 🎲 You rolled a {roll}!")
 
   if roll == 1: 
     print(f" Awesome! You get to remove one of Player {opponent}'s pieces.")
