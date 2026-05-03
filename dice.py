@@ -15,8 +15,8 @@ def remove_piece(board, target_marker):
     
   while True: 
     try: 
-      move = int(input(f" Select a ' {targetmarker} ' piece to remove (1-9): "))
-      if move < 1 or > 9:
+      move = int(input(f" Select a ' {target_marker} ' piece to remove (1-9): "))
+      if move < 1 or move > 9:
         print("Please enter a number between 1-9.")
         continue
         
@@ -62,7 +62,7 @@ def roll_dice_two(board, current_player, opponent):
     return remove_piece(board, current_player)
   else: # if roll in 2 or 3 
     print(f" No special moves! Place down a piece like regular-smegular.")
-    Return False
+    return False
 
 # dice 3 will have a 1/6 chance for removing opps or your own piece. 4/6 chance for null and placing a piece like normal game play
 
@@ -81,5 +81,3 @@ def roll_dice_three(board, current_player, opponent):
     return False 
 
   
-
-
