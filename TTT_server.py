@@ -1,4 +1,5 @@
 import sys
+from threading import thread 
 from socket32 import Socket32, create_new_socket
  
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
@@ -24,7 +25,7 @@ def handle_session(conns: list[Socket32], addrs: list):
         broadcast(conns, "Game is ready to begin!\n")
 
 
-###### Game logic #####
+###### Game Logic #####
 def print_board(board):
     print("\n")
     for row in range(3):
@@ -85,6 +86,10 @@ def get_move(conn: Socket32, board, player: str):
     while True:
         send(conn, f"  Player {player}, enter position (1-9): ")
         response = recv(conn)
+
+        if response is None: ###Chat suggested connectionerror
+            raise ConnectionError(f"Player {player} disconnected.")
+
         if not response.isdigit():
             send(conn, "Invalid input. Enter a number 1-9.")
             continue
@@ -104,8 +109,74 @@ def get_move(conn: Socket32, board, player: str):
  
         return row, col
 
+def game_session(conns: list[Socket32], addrs: list):
+    players = ["X", "O"]
+    scores  = {"X": 0, "O": 0, "Draws": 0}
+ 
+    broadcast(conns, print_guide())
+    while True:   # play again loop
+        board   = [[" ", " ", " "] for _ in range(3)]
+        current = 0  # 0 = X's turn, 1 = O's turn
+ 
+        broadcast(conns, "\n  ================================")
+        broadcast(conns, "         TIC  TAC  TOE")
+        broadcast(conns, "  ================================")
+        
+        while True:   # single game loop
+            player      = players[current]
+            active_conn = conns[current]
+            waiting_conn = conns[1 - current]
+ 
+            board_str  = print_board(board)
+            scores_str = f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}"
+ 
+            broadcast(conns, board_str)
+            broadcast(conns, scores_str + "\n")
+            send(waiting_conn, f"  Waiting for Player {player} to move...")    
 
+            try:
+                row, col = get_move(active_conn, board, player)
+            except ConnectionError as e: ### Chat Suggested connection error inclusion
+                broadcast(conns, f"\n  {e} Game over.")
+                return            
 
+            board[row][col] = player
+ 
+            broadcast(conns, "\n  ================================")
+            broadcast(conns, "         TIC  TAC  TOE")
+            broadcast(conns, "  ================================")
+ 
+            if check_winner(board, player):
+                broadcast(conns, print_board(board))
+                scores[player] += 1
+                broadcast(conns, f"  Player {player} wins!\n")
+                broadcast(conns, f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+ 
+            if is_draw(board):
+                broadcast(conns, print_board(board))
+                scores["Draws"] += 1
+                broadcast(conns, "  It's a draw!\n")
+                broadcast(conns, f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                break
+ 
+            current = 1 - current
+ 
+        # Ask both players if they want to play again (both must agree)
+        broadcast(conns, "\n  Play again? (y/n): ")
+        answers = []
+        for conn in conns:
+            ans = recv(conn)
+            if ans is None:
+                broadcast(conns, "  A player disconnected. Ending session.")
+                return
+            answers.append(ans.strip().lower())
+ 
+        if all(a == "y" for a in answers):
+            broadcast(conns, "\n  Both players want to play again! Starting new game...\n")
+        else:
+            broadcast(conns, "\n  Thanks for playing! Goodbye.\n")
+            return
 
 
 
