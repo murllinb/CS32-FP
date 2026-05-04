@@ -6,9 +6,9 @@ In order to play Dice Tic-Tac-Toe, you first need to install [] and dice.py, the
   Game Instructions:
 1. Have each player pick which symbol they want to be (X) and (O)
 2. Have each player pick which dice they want to use:
-* Extreme Dice: 1/2 odds of removing your opponents piece or your piece
-* Intermediate Dice: 1/4 odds of removing your opponents piece or your piece and 1/2 odds of nothing happening.
-* Beginnner Dice:  1/6 odds of removing your opponents piece or your piece and 2/3 odds of nothing happening.
+  * Extreme Dice: 1/2 odds of removing your opponents piece or your piece
+  * Intermediate Dice: 1/4 odds of removing your opponents piece or your piece and 1/2 odds of nothing happening.
+  * Beginnner Dice:  1/6 odds of removing your opponents piece or your piece and 2/3 odds of nothing happening.
 4. At the start of each round pick whether you want to roll the dice or place your symbol.
 5. If dice was rolled proceed with whatever attribute you were given.
 6. If you chose to place you piece then place it on the board.
