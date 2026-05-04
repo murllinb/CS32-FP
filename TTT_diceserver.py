@@ -107,6 +107,9 @@ def get_move(active_conn, board, player, dice_choices):
                 roll_dice_two(board, player, opponent)
             elif dice_num == 3:
                 roll_dice_three(board, player, opponent)
+
+            send(active_conn, dice_msg)
+
             continue    
         
         if decide == 'place':
