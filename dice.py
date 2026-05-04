@@ -101,6 +101,7 @@ def roll_dice_three(board, current_player, opponent, powerup_1_active):
     if powerup_1_active: 
       skip_roll = random.randint(1,2)
       if skip_roll == 1: 
-        print(" Powerup Sucess! 
-    #print("  Nothing significant happened! You must place down a piece...")
-    #return False
+        print(" Powerup Sucess! Your opponent's turn is skipped!")
+        return True, True
+    print("  Nothing significant happened! You must place down a piece...")
+    return False, False 
