@@ -34,9 +34,7 @@ In order to play this game, there must be 3 split terminals running.
 10. Select whether you would like to play another round.
 
 Resources Used:
-  ChatGPT: Was used to refine formatting issues (i.e. find a way to clear the terminal to avoid clutter and format text to appear more visibly clear in the terminal).
-* Commented parts where ChatGPT was used.
-  Server Logic:
+* ChatGPT: Was used to refine formatting issues (i.e. find a way to clear the terminal to avoid clutter and format text to appear more visibly clear in the terminal). Commented parts where ChatGPT was used/helped.
 * Pset 3 (copied socket32.py)
 * Modified socket logic for 2 clients: https://www.youtube.com/watch?v=5G_bNVKdECk
 * Threading logic used for 2 clients: https://docs.python.org/3/library/threading.html
