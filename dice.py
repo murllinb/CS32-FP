@@ -60,32 +60,47 @@ def roll_dice_one(board, current_player, opponent):
 
 
 # dice 2 will have a 1/4 chance for replacing opps piece or losing a turn. 1/2 chance for null and placing a piece like normal game play
-def roll_dice_two(board, current_player, opponent):
+# I will implement the powerup one logic into dice 2 and 3
+def roll_dice_two(board, current_player, opponent, powerup_1_active):
   roll = random.randint(1,4)
   print(f"\n  🎲 You rolled a {roll}!") 
 
   if roll == 1:
     print(f"  You got a 1! You get to replace one of Player {opponent}'s pieces with your own.")
-    return replace_piece(board, opponent, current_player)  
+    return replace_piece(board, opponent, current_player), False  
   elif roll == 4:
     print("  OH NO, you rolled a 4. TURN SKIPPED WOMP WOMP")
-    return True
+    return True, False
   else: # if roll in 2 or 3 
+    if powerup_1_active: 
+      skip_roll = random.randint(1,2)
+      if skip_roll == 1: 
+        print(" Powerup Activated! Your opponent's turn is skipped!")
+        return True, True
+        
     print(f" No special moves! Place down a piece like regular-smegular.")
-    return False
+    return False, False 
+    # commented out old dice 2 stuff
+    #print(f" No special moves! Place down a piece like regular-smegular.")
+    #return False
 
 
 # dice 3 will have a 1/6 chance for replacing opps piece or losing a turn. 4/6 chance for null and placing a piece like normal game play
-def roll_dice_three(board, current_player, opponent):
+def roll_dice_three(board, current_player, opponent, powerup_1_active):
   roll = random.randint(1,6)
   print(f"\n  🎲 You rolled a {roll}!")
 
   if roll == 1: 
     print(f"  Awesome! You get to replace one of Player {opponent}'s pieces with your own.")
-    return replace_piece(board, opponent, current_player)
+    return replace_piece(board, opponent, current_player), False
   elif roll == 6: 
     print("  OH NO, you rolled too high. TURN SKIPPED WOMP WOMP")
-    return True 
+    return True, False 
   else: 
-    print("  Nothing significant happened! You must place down a piece...")
-    return False
+    # update powerup 1 into dice three logic 
+    if powerup_1_active: 
+      skip_roll = random.randint(1,2)
+      if skip_roll == 1: 
+        print(" Powerup Sucess! 
+    #print("  Nothing significant happened! You must place down a piece...")
+    #return False
