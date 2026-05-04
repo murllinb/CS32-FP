@@ -127,8 +127,7 @@ def explain_dice_rules(): #Revised by ChatGPT to have cleaner formatting
     print(sep)
     print()
 
-def print_streak():
-    print(streak\n)
+def print_streak(multiplier):
     print(f"X streak: {multiplier['X']['streak']} Best: {multiplier['X']['best_streak']}\n")
     print(f"O streak: {multiplier['O']['streak']} Best: {multiplier['O']['best_streak']}\n")
 
@@ -142,8 +141,10 @@ def main():
     multiplier = {
         "X": {"streak": 0, "best_streak": 0},
         "O": {"streak": 0, "best_streak": 0}
+    }
     coins = {"X": 0, "O": 0}
     inventory = {"X": [], "O": []}
+    lastwinner = ""
 
     while True:
         clear()
@@ -279,19 +280,20 @@ def main():
             # Check if current player won
             if check_winner(board, player):
                 print_board(board)
-                scores[player] += 1
-                coins[player] += 1 * (1 + multiplier)
+                scores[player] += 1 + multiplier[player]["streak"]
+                coins[player] += 1 + mi
                 if lastwinner == player: 
                     multiplier[player]["streak"] += 1
                     if multiplier[player]["streak"] > multiplier[player]["best_streak"]:
                         multiplier[player]["best_streak"] = multiplier[player]["streak"]
                 else:
-                    multipler[lastwinner]["streak"] = 0
+                    if lastwinner in ["X", "O"]:
+                        multiplier[lastwinner]["streak"] = 0
                     lastwinner = player
     
-                print(f"  {current_name} wins and has a coin multiplier of {multipler[player]["streak"]}x! (+{1 * (1 + multipler[player]["streak"])} Coins)\n")
+                print(f"  {current_name} wins and has a coin multiplier of {multiplier[player]['streak']}x! (+{coins_earned} Coins)\n")
                 print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
-                print_streak()
+                print_streak(multipler)
                 break
 
             # Check if the board is full with no winner
