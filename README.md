@@ -17,4 +17,7 @@ In order to play Dice Tic-Tac-Toe, you first need to install basegame.py and dic
 
 Resources Used:
   ChatGPT: Was used to refine formatting issues (i.e. find a way to clear the terminal to avoid clutter and format text to appear more visibly clear in the terminal).
-* Commented parts where ChatGPT was used. 
+* Commented parts where ChatGPT was used.
+  Server Logic:
+* Pset 3 (copied logic from socket)
+* Modified socket logic for 2 clients: https://www.youtube.com/watch?v=5G_bNVKdECk
