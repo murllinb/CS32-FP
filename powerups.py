@@ -7,6 +7,8 @@
 # so that we can implement the powerups. everything will be stored locally, so should you
 # end the tournament, none of the data is saved. 
 
+# powerup 2 ideation: 
+
 def visit_shop(coins, inventory, player_name): 
   while True: 
     print(f"\n  ========================================")
