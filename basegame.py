@@ -1,7 +1,5 @@
 ### import os and terminal clearing was a GAI suggestion to help deal with visual clutter, I commented out all the code that did the suggestion to show that the code still works w/o it.
 import os
-
-import turtle
 import time
 
 from graphics import setup_turtle_screen, sync_turtle_board
@@ -98,19 +96,6 @@ def get_move(board, player, player_name):
         except ValueError:
             print("  Invalid input. Enter a number 1-9.")
 
-    
-
-# def explain_dice_rules():
-#     print("\n  ========================================================")
-#     print("                    DICE POWER-UPS")
-#     print("  ========================================================")
-#     print("  Dice 1: 50% chance to replace opponent's piece, 50% to lose your turn.")
-#     print("  Dice 2: 25% chance to replace opponent's piece, 25% to lose your turn,")
-#     print("          50% chance of nothing (place piece normally).")
-#     print("  Dice 3: ~17% (1/6) chance to replace opponent's piece, ~17% (1/6) to lose your turn,")
-#     print("          ~66% (4/6) chance of nothing (place piece normally).")
-#     print("  ========================================================\n")
-
 def explain_dice_rules(): #Revised by ChatGPT to have cleaner formatting
     width = 80
     sep = ("=" * 58).center(width)
@@ -137,6 +122,9 @@ def print_streak(multiplier):
     print(f"O streak: {multiplier['O']['streak']} Best: {multiplier['O']['best_streak']}\n")
 
 def main():
+    # TURTLE: Initialize the screen and pen once when the game starts
+    screen, pen = setup_turtle_screen()
+
     is_new_tournament = True
     player_names = {}
     players = ["X", "O"]
@@ -153,9 +141,6 @@ def main():
 
     while True:
         clear()
-        # print("\n  ================================")
-        # print("        TIC  TAC  TOE")
-        # print("  ================================")
 
         width = 80 #ChatGPT revised formatting
         sep = ("=" * 32).center(width)
@@ -184,13 +169,9 @@ def main():
         for p in players:
             active_powerups[p] = ask_to_activate(inventory[p], player_names[p])
 
-        # make sure if powerup one is chosen, dice one is not
         dice_choices = {}
         print()
 
-        dice_choices = {}
-
-        print()
         for p in players:
             while True:
                 # make sure powerup 1 and dice 1 are not used together
@@ -218,6 +199,9 @@ def main():
             [" ", " ", " "],
             [" ", " ", " "]
         ]
+        
+        # TURTLE: Draw the initial empty board to the visual screen
+        sync_turtle_board(board, pen, screen)
 
         current = 0  # 0 = X's turn, 1 = O's turn
 
@@ -235,6 +219,7 @@ def main():
                 print(f"  ================================")
                 skipped_turns[player] = False # Turn off the skip for next time
                 current = 1 if current == 0 else 0 # Switch to other player
+                time.sleep(1.5) # Pauses so they can read the skip message
                 continue
 
             print_board(board)
@@ -266,16 +251,17 @@ def main():
                 # is skip is used, apply it
                 if opp_skipped == True:
                     skipped_turns[opponent] = True
+                    
+                # TURTLE: Update screen in case the dice caused an opponent's piece to be replaced
+                sync_turtle_board(board, pen, screen)
 
             # if the player chose to place a piece or their dice roll didn't give a removal
             if action == 'place' or not turn_used_by_dice:
                 row, col = get_move(board, player, current_name)
                 board[row][col] = player
-
-            # below part has been updated into above part
-            # Ask for player move and place on board
-            # row, col = get_move(board, player)
-            # board[row][col] = player
+                
+                # TURTLE: Update screen after placing a regular piece
+                sync_turtle_board(board, pen, screen)
 
             clear()
             print("\n  ================================")
@@ -285,9 +271,13 @@ def main():
             # Check if current player won
             if check_winner(board, player):
                 print_board(board)
-                scores[player] += 1 + multiplier[player]["streak"]
-                coins[player] += 1 + mi
-                if lastwinner == player: 
+                
+                # FIXED BUG: calculate coins_earned BEFORE using it
+                coins_earned = 1 + multiplier[player]["streak"]
+                scores[player] += coins_earned
+                coins[player] += coins_earned
+                
+                if lastwinner == player:
                     multiplier[player]["streak"] += 1
                     if multiplier[player]["streak"] > multiplier[player]["best_streak"]:
                         multiplier[player]["best_streak"] = multiplier[player]["streak"]
@@ -295,10 +285,10 @@ def main():
                     if lastwinner in ["X", "O"]:
                         multiplier[lastwinner]["streak"] = 0
                     lastwinner = player
-    
+
                 print(f"  {current_name} wins and has a coin multiplier of {multiplier[player]['streak']}x! (+{coins_earned} Coins)\n")
                 print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
-                print_streak(multipler)
+                print_streak(multiplier)
                 break
 
             # Check if the board is full with no winner
@@ -316,10 +306,7 @@ def main():
             else:
                 current = 0
 
-# UPDATE: I am adding this in the end of the game, asking the players if they want to save their wins and continue
-# playing like a tournament.
-
-# post game menu...
+        # post game menu...
         while True:
             print("\n  ========================================================")
             print("  WHAT WOULD YOU LIKE TO DO NEXT?")
@@ -349,13 +336,6 @@ def main():
             is_new_tournament = True
         elif again == "c":
             is_new_tournament = False
-
-
-        #print()
-        #again = input("  Play again? (y/n): ").strip().lower()
-        #if again != "y":
-            #print("\n  Thanks for playing! Goodbye.\n")
-            #break
 
 if __name__ == "__main__":
     main()
