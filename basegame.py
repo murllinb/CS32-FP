@@ -1,7 +1,10 @@
 ### import os and terminal clearing was a GAI suggestion to help deal with visual clutter, I commented out all the code that did the suggestion to show that the code still works w/o it.
 import os
 
-#import turtle 
+import turtle
+import time
+
+from graphics import setup_turtle_screen, sync_turtle_board
 
 from dice import roll_dice_one
 from dice import roll_dice_two
