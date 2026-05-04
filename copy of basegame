@@ -93,12 +93,12 @@ def get_move(board, player, player_name):
 
 # def explain_dice_rules(): 
 #     print("\n  ========================================================")
-#     print("                   DICE POWER-UPS")
+#     print("                    DICE POWER-UPS")
 #     print("  ========================================================")
-#     print("  Dice 1: 50% chance to remove opponent's piece, 50% to remove your own.") # Dice 1 will have a 50% chance of removing your opponents piece and a 50% chance you have to remove your own piece. [cite: 1]
-#     print("  Dice 2: 25% chance to remove opponent's piece, 25% to remove your own,")
+#     print("  Dice 1: 50% chance to replace opponent's piece, 50% to lose your turn.") 
+#     print("  Dice 2: 25% chance to replace opponent's piece, 25% to lose your turn,")
 #     print("          50% chance of nothing (place piece normally).")
-#     print("  Dice 3: ~17% (1/6) chance to remove opponent's piece, ~17% (1/6) to remove your own,")
+#     print("  Dice 3: ~17% (1/6) chance to replace opponent's piece, ~17% (1/6) to lose your turn,")
 #     print("          ~66% (4/6) chance of nothing (place piece normally).")
 #     print("  ========================================================\n")
 
@@ -112,11 +112,11 @@ def explain_dice_rules(): #Revised by ChatGPT to have cleaner formatting
     print("DICE POWER-UPS".center(width))
     print(sep)
     lines = [
-        "Dice 1: ~17% chance to remove opponent's piece, ~17% to remove your own,",
-        "        ~66% chance of nothing (place piece normally).",
-        "Dice 2: 25% chance to remove opponent's piece, 25% to remove your own,",
+        "Dice 1: 50% chance to replace opponent's piece, 50% chance to lose turn.",
+        "Dice 2: 25% chance to replace opponent's piece, 25% chance to lose turn,",
         "        50% chance of nothing (place piece normally).",
-        "Dice 3: 50% chance to remove opponent's piece, 50% to remove your own.",
+        "Dice 3: ~17% chance to replace opponent's piece, ~17% chance to lose turn,",
+        "        ~66% chance of nothing (place piece normally).",
     ]
     for line in lines:
         print(indent + line)
@@ -124,10 +124,13 @@ def explain_dice_rules(): #Revised by ChatGPT to have cleaner formatting
     print()
 
 def main():
+    is_new_tournament = True
+    player_names = {}
+    
     while True:
         clear()
         # print("\n  ================================")
-        # print("         TIC  TAC  TOE")
+        # print("        TIC  TAC  TOE")
         # print("  ================================")
 
         width = 80 #ChatGPT revised formatting
@@ -171,7 +174,6 @@ def main():
         ]
 
         current = 0  # 0 = X's turn, 1 = O's turn
-        scores = {"X": 0, "O": 0, "Draws": 0}
 
         print_guide()
 
@@ -216,7 +218,7 @@ def main():
 
             clear()
             print("\n  ================================")
-            print("         TIC  TAC  TOE")
+            print("        TIC  TAC  TOE")
             print("  ================================")
 
             # Check if current player won
@@ -232,7 +234,7 @@ def main():
                 print_board(board)
                 scores["Draws"] += 1
                 print("  It's a draw!\n")
-                    print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
+                print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
                 break
 
             # Switch to the other player (0 → 1, or 1 → 0)
