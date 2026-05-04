@@ -2,7 +2,7 @@
 CS32 FP by [Murllin Bender,  Elisabeth Lai, Siya Patel]
 
 Instructions:
-In order to play Dice Tic-Tac-Toe, you first need to install [] and dice.py, then run []. 
+In order to play Dice Tic-Tac-Toe, you first need to install basegame.py and dice.py, then run basegame.py. 
   Game Instructions:
 1. Have each player pick which symbol they want to be (X) and (O)
 2. Have each player pick which dice they want to use:
