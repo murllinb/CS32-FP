@@ -93,7 +93,7 @@ def get_move(active_conn, board, player, dice_choices):
         if decide is None:
             raise ConnectionError(f"Player {player} disconnected.")
         
-        if decide != 'roll' or 'place':
+        if decide not in ['roll', 'place']:
             send(active_conn, "Please type 'roll' or 'place' to continue")
         
         if decide == 'roll':
@@ -109,7 +109,7 @@ def get_move(active_conn, board, player, dice_choices):
                 roll_dice_three(board, player, opponent)
             continue    
         
-        if decide is 'place':
+        if decide == 'place':
 
             send(active_conn, f" Player {player}, enter position (1-9): ")
             response = recv(active_conn)
@@ -199,7 +199,7 @@ def game_session(conns: list[Socket32], addrs: list):
             send(waiting_conn, f"  Waiting for Player {player} to decide...")    
 
             try:
-                row, col = get_move(active_conn, board, player)
+                row, col = get_move(active_conn, board, player, dice_choices)
             except ConnectionError as e:
                 broadcast(conns, f"\n  {e} Game over.")
                 return            
