@@ -17,7 +17,7 @@ In order to play Dice Tic-Tac-Toe, you first need to install basegame.py and dic
 7. Repeat steps 4-6 until there is a draw or a winner.
 
 Updated Instructions:
-In order to play Dice Tic-Tac-Toe, you first need to install socket32.py, basegame_server.py, basegame_client1.py, and basegame_client2.py.
+In order to play Dice Tic-Tac-Toe, you first need to install socket32.py, dice.py, basegame_server.py, basegame_client1.py, and basegame_client2.py.
 In order to play this game, there must be 3 split terminals running.
 1. Initialize basegame_server.py in one of the terminals. 
 2. Initialize basegame_client1.py in one of the other terminals.
