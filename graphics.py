@@ -1,4 +1,4 @@
-# graphics.py
+# graphics.py # the setup, coordinates, and sync turtle board are done by gemini. 
 import turtle
 
 # Map row, col to exact X, Y coordinates on the turtle screen
