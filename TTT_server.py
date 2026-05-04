@@ -1,12 +1,12 @@
 import sys
-from threading import thread 
+from threading import Thread 
 from socket32 import Socket32, create_new_socket
  
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 9999
 
 def send(conn: Socket32, message: str):
-    conn.sendall(message + "\n")
+    conn.sendall(message + "\n")   
  
 def broadcast(conns: list[Socket32], message: str):
     for conn in conns:
@@ -19,66 +19,60 @@ def recv(conn: Socket32) -> str | None:
     return msg.strip()
 
 def handle_session(conns: list[Socket32], addrs: list):
-        player_ids = [1, 2]
-        for i, conn in enumerate(conns):
-            send(conn, f"Welcome, Player {player_ids[i]}! Both players are connected.")
-        broadcast(conns, "Game is ready to begin!\n")
+    player_ids = [1, 2]
+    for i, conn in enumerate(conns):
+        send(conn, f"Welcome, Player {player_ids[i]}! Both players are connected.")
+    broadcast(conns, "Game is ready to begin!\n")
 
 
 ###### Game Logic #####
 def print_board(board):
-    print("\n")
+    output = "\n"
     for row in range(3):
-        # Build each row as " X | O |   " etc.
         cell1 = " " + board[row][0] + " "
         cell2 = " " + board[row][1] + " "
         cell3 = " " + board[row][2] + " "
-        print("  " + cell1 + "|" + cell2 + "|" + cell3)
+        output += "  " + cell1 + "|" + cell2 + "|" + cell3 + "\n"
         if row < 2:
-            print("  " + "-----------")
-    print()
+            output += "  -----------\n"
+    return output   
 
 # Print a numbered guide so players know which number = which spot
 def print_guide():
-    print("  Position guide:")
+    output = "  Position guide:\n"
     num = 1
     for row in range(3):
         cell1 = " " + str(num) + " ";   num += 1
         cell2 = " " + str(num) + " ";   num += 1
         cell3 = " " + str(num) + " ";   num += 1
-        print("  " + cell1 + "|" + cell2 + "|" + cell3)
+        output += "  " + cell1 + "|" + cell2 + "|" + cell3 + "\n"
         if row < 2:
-            print("  " + "-----------")
-    print()
+            output += "  -----------\n"
+    return output  
 
-# Retur true if the given player has won
+
 def check_winner(board, player):
-    # Check each row
     for row in range(3):
         if board[row][0] == player and board[row][1] == player and board[row][2] == player:
             return True
 
-    # Check each column
     for col in range(3):
         if board[0][col] == player and board[1][col] == player and board[2][col] == player:
             return True
 
-    # Check top-left to bottom-right diagonal
     if board[0][0] == player and board[1][1] == player and board[2][2] == player:
         return True
 
-    # Check top-right to bottom-left diagonal
     if board[0][2] == player and board[1][1] == player and board[2][0] == player:
         return True
 
     return False
 
-# Return true if every cell is filled (no one won = draw)
 def is_draw(board):
     for row in range(3):
         for col in range(3):
             if board[row][col] == " ":
-                return False  # empty spot was found, so not a draw yet
+                return False
     return True
 
 
@@ -87,7 +81,7 @@ def get_move(conn: Socket32, board, player: str):
         send(conn, f"  Player {player}, enter position (1-9): ")
         response = recv(conn)
 
-        if response is None: ###Chat suggested connectionerror
+        if response is None:
             raise ConnectionError(f"Player {player} disconnected.")
 
         if not response.isdigit():
@@ -109,25 +103,27 @@ def get_move(conn: Socket32, board, player: str):
  
         return row, col
 
+
 def game_session(conns: list[Socket32], addrs: list):
     players = ["X", "O"]
     scores  = {"X": 0, "O": 0, "Draws": 0}
  
-    broadcast(conns, print_guide())
-    while True:   # play again loop
+    broadcast(conns, print_guide())   
+
+    while True:
         board   = [[" ", " ", " "] for _ in range(3)]
-        current = 0  # 0 = X's turn, 1 = O's turn
+        current = 0
  
         broadcast(conns, "\n  ================================")
         broadcast(conns, "         TIC  TAC  TOE")
         broadcast(conns, "  ================================")
         
-        while True:   # single game loop
+        while True:
             player      = players[current]
             active_conn = conns[current]
             waiting_conn = conns[1 - current]
  
-            board_str  = print_board(board)
+            board_str  = print_board(board)  
             scores_str = f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}"
  
             broadcast(conns, board_str)
@@ -136,7 +132,7 @@ def game_session(conns: list[Socket32], addrs: list):
 
             try:
                 row, col = get_move(active_conn, board, player)
-            except ConnectionError as e: ### Chat Suggested connection error inclusion
+            except ConnectionError as e:
                 broadcast(conns, f"\n  {e} Game over.")
                 return            
 
@@ -162,7 +158,6 @@ def game_session(conns: list[Socket32], addrs: list):
  
             current = 1 - current
  
-        # Ask both players if they want to play again (both must agree)
         broadcast(conns, "\n  Play again? (y/n): ")
         answers = []
         for conn in conns:
@@ -178,17 +173,6 @@ def game_session(conns: list[Socket32], addrs: list):
             broadcast(conns, "\n  Thanks for playing! Goodbye.\n")
             return
 
-
-
-    broadcast(conns, "Placeholder: type anything and it will be echoed back.")
- 
-    while True:
-        for i, conn in enumerate(conns):
-            msg = recv(conn)
-            if msg is None:
-                broadcast(conns, f"Player {player_ids[i]} disconnected. Session ended.")
-                return
-            send(conn, f"Echo: {msg}")
 
 def run():
     with create_new_socket() as server:
@@ -208,6 +192,7 @@ def run():
  
             print("[server] Both players connected. Starting session.")
             handle_session(conns, addrs)
+            game_session(conns, addrs)  
             print("[server] Session ended. Ready for new players.\n")
  
  
