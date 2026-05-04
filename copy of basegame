@@ -66,10 +66,11 @@ def is_draw(board):
     return True
 
 # Ask the player for a move and returns the row and column
-def get_move(board, player):
+# personalizing the game by asking the two players to input their names 
+def get_move(board, player, player_name):
     while True:
         try:
-            move = int(input(f" Player {player}, enter position (1-9): "))
+            move = int(input(f" {player_name} ({player}), enter position (1-9): "))
 
             if move < 1 or move > 9:
                 print("  Please enter a number between 1 and 9.")
@@ -136,14 +137,26 @@ def main():
         print("TIC  TAC  TOE".center(width))
         print(sep)
 
-        explain_dice_rules()
+        # since we are implementing tournaments, we don't want to print the rules every time. only if its a new game
+        if is_new_tournament: 
+            explain_dice_rules()
+
+            print("\n  ================================")
+            print("  PLAYER SETUP")
+            print("  ================================")
+            player_names["X"] = input("  Enter name for Player X: ").strip() or "Player X"
+            player_names["O"] = input("  Enter name for Player O: ").strip() or "Player O"
+
+            # reset scoures for the new tournament 
+            scores = {"X": 0, "O": 0, "Draws": 0}
 
         players = ["X", "O"]
         dice_choices = {}
 
+        print()
         for p in players: 
             while True: 
-                choice = input(f" Player {p}, choose your dice (1, 2, or 3): ").strip()
+                choice = input(f" {player_names[p]} (playing as {p}), choose your dice (1, 2, or 3): ").strip()
                 if choice in ['1', '2', '3']: 
                     dice_choices[p] = int(choice) 
                     break 
@@ -165,15 +178,16 @@ def main():
         while True:
             player = players[current]
             opponent = players[1 if current == 0 else 0] # this way we can be more effective with dice uses 
+            current_name = player_names[player]
 
             print_board(board)
-            print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+            print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
             print()
 
             # now we ask for rolling or placing 
             action = ''
             while action not in ['roll', 'place']:
-                action = input(f" Player {player}, do you want to 'roll' your dice or 'place' a piece? ")
+                action = input(f" Player {current_name}, do you want to 'roll' your dice or 'place' a piece? ")
                 if action not in ['roll', 'place']:
                     print(" Please type 'roll' or 'place'. ")
 
@@ -192,7 +206,7 @@ def main():
 
             # if the player chose to place a piece or their dice roll didn't give a removal 
             if action == 'place' or not turn_used_by_dice: 
-                row, col = get_move(board, player) 
+                row, col = get_move(board, player, current_name) 
                 board[row][col] = player 
 
             # below part has been updated into above part
@@ -209,8 +223,8 @@ def main():
             if check_winner(board, player):
                 print_board(board)
                 scores[player] += 1
-                print(f"  Player {player} wins!\n")
-                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                print(f"  {current_name} wins!\n")
+                print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
                 break
 
             # Check if the board is full with no winner
@@ -218,7 +232,7 @@ def main():
                 print_board(board)
                 scores["Draws"] += 1
                 print("  It's a draw!\n")
-                print(f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                    print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
                 break
 
             # Switch to the other player (0 → 1, or 1 → 0)
@@ -227,11 +241,38 @@ def main():
             else:
                 current = 0
 
-        print()
-        again = input("  Play again? (y/n): ").strip().lower()
-        if again != "y":
-            print("\n  Thanks for playing! Goodbye.\n")
+# UPDATE: I am adding this in the end of the game, asking the players if they want to save their wins and continue
+# playing like a tournament. 
+
+# post game menu...
+        print("\n  ========================================================")
+        print("  WHAT WOULD YOU LIKE TO DO NEXT?")
+        print("  ========================================================")
+        print("  [C] CONTINUE TOURNAMENT: Your current wins and names")
+        print("      will be saved and pass over onto the next round.")
+        print("  [N] START NEW GAME: This will erase all current scores")
+        print("      and let you enter new names for a fresh start.")
+        print("  [Q] QUIT: Exit the game.")
+        print("  ========================================================")
+
+        again = ""
+        while again not in ['c', 'n', 'q']:
+            again = input("  Choose C, N, or Q: ").strip().lower()
+
+        if again == "q":
+            print("\n  Thanks for playing gang! Have a swagalicious day.\n")
             break
+        elif again == "n":
+            is_new_tournament = True # This triggers the name/score reset at the top of the loop
+        elif again == "c":
+            is_new_tournament = False # This skips the reset, preserving names and scores
+
+
+        #print()
+        #again = input("  Play again? (y/n): ").strip().lower()
+        #if again != "y":
+            #print("\n  Thanks for playing! Goodbye.\n")
+            #break
 
 if __name__ == "__main__":
     main()
