@@ -1,5 +1,14 @@
 # Dice 1 will have a 50% chance of removing your opponents piece and a 50% chance you have to remove your own piece. 
 # Dice 1 will have two functions. A function for removing your piece and a function for removing your opps piece. 
+# Dice 2 will have a 25% chance of removing your opponents piece and a 25% chance of removing your own piece. This means, 
+# there is also a 50% chance that your dice rolls nothing siginificant, and should this happen, you are then prompted to 
+# place down a piece as usual. 
+# Dice 3 will have a 1/6 chance of removing your opponents piece and a 1/6 chance of removing your own piece. This means, 
+# there is a 4/6 chance that your dice rolls nothing significant, and should this happen, you are then prompted to place 
+# down a piece as usual. 
+# If you do roll something of significance, after carrying out the dice's task, your turn will end. Meaning, should you get to 
+# remove your opponent's piece or have to remove your own piece, your turn will end after, and you will not get the chance to then
+# place down a piece. 
 import random 
 # make a function that prompts you to remove a piece. make sure you are only removing a piece for the available board space. 
 def remove_piece(board, target_marker): 
@@ -31,16 +40,44 @@ def remove_piece(board, target_marker):
       # Remove the piece by replacing it with a blank space
       board[row][col] = " "
       print(f"  '{target_marker}' piece removed!")
-      break
+      return True
       
     except ValueError: 
       print("Numbers outside of 1-9 are invalid. Pick again...")
 
-# dice 1 will have a 1/6 chance for removing opps or your own piece. 4/6 chance for null and placing a piece like normal game play
-
 def roll_dice_one(board, current_player, opponent):
   roll = random.randint(1,6)
-  print(f"\n 🎲 You rolled a {roll}!")
+  print(f"\n  🎲 You rolled a {roll}!") 
+
+  if roll in [1,2,3]: 
+    print(f"  Awesome! You get to remove one of Player {opponent}'s pieces.")
+    return remove_piece(board, opponent) 
+  else: # roll is 4,5,6
+    print(f"  Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
+    return remove_piece(board, current_player)
+
+
+# dice 2 will have a 1/4 chance for removing opps or your own piece. 1/2 chance for null and placing a piece like normal game play
+
+def roll_dice_two(board, current_player, opponent):
+  roll = random.randint(1,4)
+  print(f"\n  🎲 You rolled a {roll}!") 
+
+  if roll == 1:
+    print(f"  You got a 1! You get to remove one of Player {opponent}'s pieces.")
+    return remove_piece(board, opponent)  
+  elif roll == 4:
+    print(f"  Oh no! You rolled a 4. You must remove one of your own '{current_player}' pieces.")
+    return remove_piece(board, current_player)
+  else: # if roll in 2 or 3 
+    print(f" No special moves! Place down a piece like regular-smegular.")
+    return False
+
+# dice 3 will have a 1/6 chance for removing opps or your own piece. 4/6 chance for null and placing a piece like normal game play
+
+def roll_dice_three(board, current_player, opponent):
+  roll = random.randint(1,6)
+  print(f"\n You rolled a {roll}!")
 
   if roll == 1: 
     print(f" Awesome! You get to remove one of Player {opponent}'s pieces.")
@@ -52,32 +89,4 @@ def roll_dice_one(board, current_player, opponent):
     print(" Nothing significant happened! You must place down a piece...")
     return False 
 
-# dice 2 will have a 1/4 chance for removing opps or your own piece. 1/2 chance for null and placing a piece like normal game play
-
-def roll_dice_two(board, current_player, opponent):
-  roll = random.choice([1, 2, 5, 6])
-  print(f"\n 🎲 You rolled a {roll}!") 
-
-  if roll == 1:
-    print(f" You got a 1! You get to remove one of Player {opponent}'s pieces.")
-    return remove_piece(board, opponent)  
-  elif roll == 6:
-    print(f" Oh no! You rolled a 4. You must remove one of your own '{current_player}' pieces.")
-    return remove_piece(board, current_player)
-  else: # if roll 2 or 5
-    print(f" No special moves! Place down a piece like regular-smegular.")
-    return False
-
-# dice 3 will have a 1/2 chance for removing opps or your own piece. 4/6 chance for null and placing a piece like normal game play
-
-def roll_dice_three(board, current_player, opponent):
-  roll = random.choice([1, 6])
-  print(f"\n 🎲 You rolled a {roll}!") 
-
-  if roll == 1: 
-    print(f"  Awesome! You get to remove one of Player {opponent}'s pieces.")
-    return remove_piece(board, opponent) 
-  else: # 6
-    print(f" Oh no! You rolled too high. You must remove one of your own '{current_player}' pieces.")
-    return remove_piece(board, current_player)
   
