@@ -93,6 +93,8 @@ def get_move(board, player, player_name):
         except ValueError:
             print("  Invalid input. Enter a number 1-9.")
 
+    
+
 # def explain_dice_rules():
 #     print("\n  ========================================================")
 #     print("                    DICE POWER-UPS")
@@ -125,6 +127,11 @@ def explain_dice_rules(): #Revised by ChatGPT to have cleaner formatting
     print(sep)
     print()
 
+def print_streak():
+    print(streak\n)
+    print(f"X streak: {multiplier['X']['streak']} Best: {multiplier['X']['best_streak']}\n")
+    print(f"O streak: {multiplier['O']['streak']} Best: {multiplier['O']['best_streak']}\n")
+
 def main():
     is_new_tournament = True
     player_names = {}
@@ -132,6 +139,9 @@ def main():
 
     # keep track of coins
     scores = {"X": 0, "O":0, "Draws": 0}
+    multiplier = {
+        "X": {"streak": 0, "best_streak": 0},
+        "O": {"streak": 0, "best_streak": 0}
     coins = {"X": 0, "O": 0}
     inventory = {"X": [], "O": []}
 
@@ -270,15 +280,25 @@ def main():
             if check_winner(board, player):
                 print_board(board)
                 scores[player] += 1
-                coins[player] += 1
-                print(f"  {current_name} wins! (+1 Coin)\n")
+                coins[player] += 1 * (1 + multiplier)
+                if lastwinner == player: 
+                    multiplier[player]["streak"] += 1
+                    if multiplier[player]["streak"] > multiplier[player]["best_streak"]:
+                        multiplier[player]["best_streak"] = multiplier[player]["streak"]
+                else:
+                    multipler[lastwinner]["streak"] = 0
+                    lastwinner = player
+    
+                print(f"  {current_name} wins and has a coin multiplier of {multipler[player]["streak"]}x! (+{1 * (1 + multipler[player]["streak"])} Coins)\n")
                 print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
+                print_streak()
                 break
 
             # Check if the board is full with no winner
             if is_draw(board):
                 print_board(board)
                 scores["Draws"] += 1
+                lastwinner = ""
                 print("  It's a draw!\n")
                 print(f"  Scores  →  {player_names['X']} (X): {scores['X']} |  {player_names['O']} (O): {scores['O']} |  Draws: {scores['Draws']}")
                 break
