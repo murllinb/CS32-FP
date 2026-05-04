@@ -3,6 +3,7 @@ import sys
 from dice import roll_dice_one
 from dice import roll_dice_two
 from dice import roll_dice_three
+
 from threading import Thread 
 from socket32 import Socket32, create_new_socket
  
@@ -79,60 +80,33 @@ def is_draw(board):
                 return False
     return True
 
-def roll_dice(conn: Socket32, board, addrs: list ):
-    dice_choices = {}
-    while True:
-        current = 0
-        
 
 def get_move(conn: Socket32, board, player: str):
-    dice_choices = {}
     while True:
-        send(conn, f" Player {player}, type to 'roll' your dice or 'place' to place your piece on the board.")
-        decide = recv(conn)
+        send(conn, f"  Player {player}, enter position (1-9): ")
+        response = recv(conn)
 
         if response is None:
             raise ConnectionError(f"Player {player} disconnected.")
-        
-        if decide != 'roll' or 'place':
-            send(conn, "Please type 'roll' or 'place' to continue")
-        
-        if decide is 'roll':
-                dice_num = dice_choices[player]
-                if dice_num == 1: 
-                    turn_used_by_dice = roll_dice_one(board, player, 1 - current) 
-                elif dice_num == 2: 
-                    turn_used_by_dice = roll_dice_two(board, player, opponent) 
-                elif dice_num == 3: 
-                    turn_used_by_dice = roll_dice_three(board, player, opponent) 
-                    
-        
-        if decide is 'place':
 
-            send(conn, f" Player {player}, enter position (1-9): ")
-            response = recv(conn)
+        if not response.isdigit():
+            send(conn, "Invalid input. Enter a number 1-9.")
+            continue
 
-            if response is None:
-                raise ConnectionError(f"Player {player} disconnected.")
+        move = int(response)
+        if move < 1 or move > 9:
+            send(conn, " Please enter a number between 1 and 9.")
+            continue
+ 
+        move_index = move - 1
+        row = move_index // 3
+        col = move_index % 3
 
-            if not response.isdigit():
-                send(conn, "Invalid input. Enter a number 1-9.")
-                continue
-
-            move = int(response)
-            if move < 1 or move > 9:
-                send(conn, "Please enter a number between 1 and 9.")
-                continue
-    
-            move_index = move - 1
-            row = move_index // 3
-            col = move_index % 3
-
-            if board[row][col] != " ":
-                send(conn, "  That spot is already taken! Try again.")
-                continue
-    
-            return row, col
+        if board[row][col] != " ":
+            send(conn, "  That spot is already taken! Try again.")
+            continue
+ 
+        return row, col
 
 
 
@@ -149,13 +123,6 @@ def game_session(conns: list[Socket32], addrs: list):
         broadcast(conns, "\n  ================================")
         broadcast(conns, "         TIC  TAC  TOE")
         broadcast(conns, "  ================================")
-
-        broadcast(conns, "\n Dice 1: 50% chance to replace opponent's piece, 50% chance to lose turn."
-        "\n Dice 2: 25% chance to replace opponent's piece, 25% chance to lose turn, 50% chance of nothing (place piece normally)." 
-        "\n Dice 3: ~17% chance to replace opponent's piece, ~17% chance to lose turn, ~66% chance of nothing (place piece normally)." 
-            )
-        broadcast(conns, "  ================================")
-
         
         while True:
             player      = players[current]
@@ -167,7 +134,7 @@ def game_session(conns: list[Socket32], addrs: list):
  
             broadcast(conns, board_str)
             broadcast(conns, scores_str + "\n")
-            send(waiting_conn, f"  Waiting for Player {player} to decide...")    
+            send(waiting_conn, f"  Waiting for Player {player} to move...")    
 
             try:
                 row, col = get_move(active_conn, board, player)
