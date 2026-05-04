@@ -17,4 +17,4 @@ In order to play Dice Tic-Tac-Toe, you first need to install [] and dice.py, the
 
 Resources Used:
   ChatGPT: Was used to refine formatting issues (i.e. find a way to clear the terminal to avoid clutter and format text to appear more visibly clear in the terminal).
-    * Commented parts where ChatGPT was used. 
+* Commented parts where ChatGPT was used. 
