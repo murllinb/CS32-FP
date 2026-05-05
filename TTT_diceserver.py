@@ -85,9 +85,10 @@ def roll_dice(conn: Socket32, board, addrs: list ):
         current = 0
 
 
-def get_move(active_conn, board, player, dice_choices):
+def get_move(active_conn, wait_conn, board, player, dice_choices):
+    rolled = False # Chat suggestion to prevent from infinite rolling
     while True:
-        send(active_conn, f" Player {player}, type to 'roll' your dice or 'place' to place your piece on the board.")
+        send(active_conn, f"Player {player}, type to 'roll' your dice or 'place' to place your piece on the board.")
         decide = recv(active_conn)
 
         if decide is None:
@@ -95,26 +96,35 @@ def get_move(active_conn, board, player, dice_choices):
         
         if decide not in ['roll', 'place']:
             send(active_conn, "Please type 'roll' or 'place' to continue")
+            continue
         
         if decide == 'roll':
+            if rolled:
+                send(active_conn, "You already rolled this turn.")
+                continue
+
+            rolled = True # This prevents from spamming rolls
             dice_num = dice_choices[player]
 
             opponent = "O" if player == "X" else "X"
 
+
             if dice_num == 1:
-                roll_dice_one(board, player, opponent)
+                removed = roll_dice_one(board, active_conn, player, opponent)
             elif dice_num == 2:
-                roll_dice_two(board, player, opponent)
+                removed = roll_dice_two(board, active_conn, player, opponent)
             elif dice_num == 3:
-                roll_dice_three(board, player, opponent)
+                removed = roll_dice_three(board, active_conn, player, opponent)
 
-            send(active_conn, dice_msg)
+            # If player removed a piece skip them getting to place it
+            if removed:
+                return None, None
 
-            continue    
+            continue
         
         if decide == 'place':
 
-            send(active_conn, f" Player {player}, enter position (1-9): ")
+            send(active_conn, f"Player {player}, enter position (1-9): ")
             response = recv(active_conn)
 
             if response is None:
@@ -155,9 +165,9 @@ def game_session(conns: list[Socket32], addrs: list):
         broadcast(conns, "         TIC  TAC  TOE")
         broadcast(conns, "  ================================")
 
-        broadcast(conns, "\nDice 1: 50% chance to replace opponent's piece, 50% chance to lose turn."
+        broadcast(conns, "\nDice 1: ~17% chance to replace opponent's piece, ~17% chance to lose turn, ~66% chance of nothing (place piece normally)."
         "\nDice 2: 25% chance to replace opponent's piece, 25% chance to lose turn, 50% chance of nothing (place piece normally)." 
-        "\nDice 3: ~17% chance to replace opponent's piece, ~17% chance to lose turn, ~66% chance of nothing (place piece normally)." 
+        "\nDice 3: 50% chance to replace opponent's piece, 50% chance to lose turn." 
             )
         broadcast(conns, "  ================================")
 
@@ -195,17 +205,21 @@ def game_session(conns: list[Socket32], addrs: list):
             broadcast(conns, print_guide()) 
  
             board_str  = print_board(board)  
-            scores_str = f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}"
+            scores_str = f"Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}"
  
             broadcast(conns, board_str)
             broadcast(conns, scores_str + "\n")
-            send(waiting_conn, f"  Waiting for Player {player} to decide...")    
+            send(waiting_conn, f"Waiting for Player {player} to decide...")    
 
             try:
-                row, col = get_move(active_conn, board, player, dice_choices)
+                row, col = get_move(active_conn, waiting_conn, board, player, dice_choices)
             except ConnectionError as e:
                 broadcast(conns, f"\n  {e} Game over.")
                 return            
+
+            if row is None:
+                current = 1 - current
+                continue
 
             board[row][col] = player
  
@@ -216,15 +230,15 @@ def game_session(conns: list[Socket32], addrs: list):
             if check_winner(board, player):
                 broadcast(conns, print_board(board))
                 scores[player] += 1
-                broadcast(conns, f"  Player {player} wins!\n")
-                broadcast(conns, f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                broadcast(conns, f"Player {player} wins!\n")
+                broadcast(conns, f"Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
                 break
  
             if is_draw(board):
                 broadcast(conns, print_board(board))
                 scores["Draws"] += 1
                 broadcast(conns, "  It's a draw!\n")
-                broadcast(conns, f"  Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
+                broadcast(conns, f"Scores  →  X: {scores['X']}  |  O: {scores['O']}  |  Draws: {scores['Draws']}")
                 break
  
             current = 1 - current
