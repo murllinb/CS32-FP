@@ -1,8 +1,5 @@
-### import os and terminal clearing was a GAI suggestion to help deal with visual clutter, I commented out all the code that did the suggestion to show that the code still works w/o it.
 import os
 import time
-
-from graphics import setup_turtle_screen, sync_turtle_board
 
 from dice import roll_dice_one
 from dice import roll_dice_two
@@ -122,9 +119,6 @@ def print_streak(multiplier):
     print(f"O streak: {multiplier['O']['streak']} Best: {multiplier['O']['best_streak']}\n")
 
 def main():
-    # TURTLE: Initialize the screen and pen once when the game starts
-    screen, pen = setup_turtle_screen()
-
     is_new_tournament = True
     player_names = {}
     players = ["X", "O"]
@@ -199,9 +193,6 @@ def main():
             [" ", " ", " "],
             [" ", " ", " "]
         ]
-        
-        # TURTLE: Draw the initial empty board to the visual screen
-        sync_turtle_board(board, pen, screen)
 
         current = 0  # 0 = X's turn, 1 = O's turn
 
@@ -251,17 +242,11 @@ def main():
                 # is skip is used, apply it
                 if opp_skipped == True:
                     skipped_turns[opponent] = True
-                    
-                # TURTLE: Update screen in case the dice caused an opponent's piece to be replaced
-                sync_turtle_board(board, pen, screen)
 
             # if the player chose to place a piece or their dice roll didn't give a removal
             if action == 'place' or not turn_used_by_dice:
                 row, col = get_move(board, player, current_name)
                 board[row][col] = player
-                
-                # TURTLE: Update screen after placing a regular piece
-                sync_turtle_board(board, pen, screen)
 
             clear()
             print("\n  ================================")
